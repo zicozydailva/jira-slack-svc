@@ -11,7 +11,18 @@ export class JiraController {
 
     return {
       data: res,
-      message: 'Jira issues fetched and stored',
+      message: 'Jira Issues Fetched And Stored Successfully.',
+      status: HttpStatus.OK,
+    };
+  }
+
+  @Get('issues')
+  async getAllSlackMessages() {
+    const res = await this.jiraService.fetchAllJiraIssues();
+
+    return {
+      data: res,
+      message: 'All Jira Issues Fetched Successfully',
       status: HttpStatus.OK,
     };
   }
