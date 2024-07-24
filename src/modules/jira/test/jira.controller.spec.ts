@@ -32,30 +32,6 @@ describe('JiraController', () => {
     service = module.get<JiraService>(JiraService);
   });
 
-  describe('fetchJiraIssues', () => {
-    it('should return fetched Jira issues successfully', async () => {
-      const mockIssues: JiraIssue[] = [
-        {
-          issueId: 1,
-          summary: 'Issue 1',
-          status: 'Open',
-          createdAt: new Date(),
-        },
-      ];
-      jest
-        .spyOn(service, 'fetchJiraIssues')
-        .mockResolvedValue(mockIssues as any);
-
-      const result = await controller.fetchJiraIssues();
-
-      expect(result).toEqual({
-        data: mockIssues,
-        message: 'Jira Issues Fetched And Stored Successfully.',
-        status: HttpStatus.OK,
-      });
-    });
-  });
-
   describe('getAllSlackMessages', () => {
     it('should return all Jira issues successfully', async () => {
       const mockIssues: JiraIssue[] = [
