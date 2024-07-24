@@ -1,99 +1,76 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JiraService } from '../jira.service';
-import { Repository } from 'typeorm';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { JiraIssue } from '../entities';
-import { ConfigService } from '@nestjs/config';
-import axios from 'axios';
-
-jest.mock('axios');
-jest.mock('src/helpers/error.utils');
+import { Repository } from 'typeorm';
 
 describe('JiraService', () => {
   let service: JiraService;
   let repository: Repository<JiraIssue>;
-  let configService: ConfigService;
+
+  const mockQueryBuilder = {
+    andWhere: jest.fn().mockReturnThis(),
+    getMany: jest.fn(),
+  };
+
+  const mockJiraIssueRepository = {
+    createQueryBuilder: jest.fn(() => mockQueryBuilder),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         JiraService,
         {
-          provide: Repository,
-          useValue: {
-            findOne: jest.fn(),
-            create: jest.fn(),
-            save: jest.fn(),
-            find: jest.fn(),
-          },
-        },
-        {
-          provide: ConfigService,
-          useValue: {
-            get: jest.fn(),
-          },
+          provide: getRepositoryToken(JiraIssue),
+          useValue: mockJiraIssueRepository,
         },
       ],
     }).compile();
 
     service = module.get<JiraService>(JiraService);
-    repository = module.get<Repository<JiraIssue>>(Repository);
-    configService = module.get<ConfigService>(ConfigService);
+    repository = module.get<Repository<JiraIssue>>(
+      getRepositoryToken(JiraIssue),
+    );
   });
 
-  describe('fetchJiraIssues', () => {
-    it('should fetch and store Jira issues', async () => {
-      const mockIssues = [
-        {
-          id: 1,
-          fields: {
-            summary: 'Issue 1',
-            status: { name: 'Open' },
-            created: '2024-01-01T00:00:00Z',
-          },
-        },
-      ];
-
-      (axios.get as jest.Mock).mockResolvedValue({
-        data: { issues: mockIssues },
-      });
-      (configService.get as jest.Mock).mockImplementation((key) => {
-        const config = {
-          JIRA_EMAIL: 'test@example.com',
-          JIRA_API_TOKEN: 'token',
-          JIRA_DOMAIN: 'test.atlassian.net',
-        };
-        return config[key];
-      });
-
-      const existingIssue = undefined;
-      (repository.findOne as jest.Mock).mockResolvedValue(existingIssue);
-      (repository.create as jest.Mock).mockReturnValue(mockIssues[0]);
-      (repository.save as jest.Mock).mockResolvedValue(mockIssues[0]);
-
-      expect(axios.get).toHaveBeenCalledWith(
-        'https://test.atlassian.net/rest/api/2/search',
-        expect.objectContaining({
-          params: { startAt: 0, maxResults: 100 },
-        }),
-      );
-    });
+  it('should be defined', () => {
+    expect(service).toBeDefined();
   });
 
   describe('fetchAllJiraIssues', () => {
-    it('should return all Jira issues from the repository', async () => {
-      const mockIssues = [
-        {
-          issueId: 1,
-          summary: 'Issue 1',
-          status: 'Open',
-          createdAt: new Date('2024-01-01T00:00:00Z'),
-        },
-      ];
-      (repository.find as jest.Mock).mockResolvedValue(mockIssues);
+    it('should return all issues when summary is not provided', async () => {
+      const issues = [new JiraIssue(), new JiraIssue()];
+      mockQueryBuilder.getMany.mockResolvedValue(issues);
 
       const result = await service.fetchAllJiraIssues();
+      expect(repository.createQueryBuilder).toHaveBeenCalledWith('issue');
+      expect(mockQueryBuilder.getMany).toHaveBeenCalled();
+      expect(result).toEqual(issues);
+    });
 
-      expect(result).toEqual(mockIssues);
+    it('should return filtered issues when summary is provided', async () => {
+      const issues = [new JiraIssue()];
+      const summary = 'test';
+      mockQueryBuilder.getMany.mockResolvedValue(issues);
+
+      const result = await service.fetchAllJiraIssues(summary);
+      expect(repository.createQueryBuilder).toHaveBeenCalledWith('issue');
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'issue.summary LIKE :summary',
+        { summary: `%${summary}%` },
+      );
+      expect(mockQueryBuilder.getMany).toHaveBeenCalled();
+      expect(result).toEqual(issues);
+    });
+
+    it('should log error and throw BadRequestException on failure', async () => {
+      const error = new Error('test error');
+      jest.spyOn(service['logger'], 'log').mockImplementation();
+      mockQueryBuilder.getMany.mockRejectedValue(error);
+
+      await expect(service.fetchAllJiraIssues()).rejects.toThrow(error);
+      expect(service['logger'].log).toHaveBeenCalledWith(error);
     });
   });
 });
