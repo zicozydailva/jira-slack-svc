@@ -13,9 +13,18 @@ export class JiraService {
     private readonly jiraIssueRepository: Repository<JiraIssue>,
   ) {}
 
-  async fetchAllJiraIssues() {
+  async fetchAllJiraIssues(summary?: string) {
     try {
-      return await this.jiraIssueRepository.find();
+      const query = this.jiraIssueRepository.createQueryBuilder('issue');
+
+      // Apply search filter for summary
+      if (summary) {
+        query.andWhere('issue.summary LIKE :summary', {
+          summary: `%${summary}%`,
+        });
+      }
+
+      return await query.getMany();
     } catch (error) {
       this.logger.log(error);
       ErrorHelper.BadRequestException(error);

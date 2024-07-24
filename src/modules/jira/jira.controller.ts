@@ -1,4 +1,4 @@
-import { Controller, Get, HttpStatus } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
 import { JiraService } from './jira.service';
 
 @Controller('jira')
@@ -6,8 +6,8 @@ export class JiraController {
   constructor(private readonly jiraService: JiraService) {}
 
   @Get('fetch-issues')
-  async getAllSlackMessages() {
-    const res = await this.jiraService.fetchAllJiraIssues();
+  async fetchAllJiraIssues(@Query('summary') summary: string) {
+    const res = await this.jiraService.fetchAllJiraIssues(summary);
 
     return {
       data: res,
