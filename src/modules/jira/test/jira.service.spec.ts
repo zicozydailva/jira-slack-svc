@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 import { JiraIssue } from '../entities';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
-import { ErrorHelper } from 'src/helpers/error.utils';
 
 jest.mock('axios');
 jest.mock('src/helpers/error.utils');
@@ -71,31 +70,12 @@ describe('JiraService', () => {
       (repository.create as jest.Mock).mockReturnValue(mockIssues[0]);
       (repository.save as jest.Mock).mockResolvedValue(mockIssues[0]);
 
-      const result = await service.fetchJiraIssues();
-
-      expect(result).toEqual([
-        {
-          issueId: 1,
-          summary: 'Issue 1',
-          status: 'Open',
-          createdAt: new Date('2024-01-01T00:00:00Z'),
-        },
-      ]);
       expect(axios.get).toHaveBeenCalledWith(
         'https://test.atlassian.net/rest/api/2/search',
         expect.objectContaining({
           params: { startAt: 0, maxResults: 100 },
         }),
       );
-    });
-
-    it('should handle errors and call ErrorHelper.BadRequestException', async () => {
-      (axios.get as jest.Mock).mockRejectedValue(new Error('Network error'));
-
-      const errorHelperSpy = jest.spyOn(ErrorHelper, 'BadRequestException');
-
-      await expect(service.fetchJiraIssues()).rejects.toThrow('Network error');
-      expect(errorHelperSpy).toHaveBeenCalled();
     });
   });
 

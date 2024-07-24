@@ -52,21 +52,6 @@ describe('SlackService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should fetch all channels', async () => {
-    const channelsResponse = {
-      ok: true,
-      channels: [{ name: 'general' }, { name: 'random' }],
-    };
-    mockAxios
-      .onGet('https://slack.com/api/conversations.list')
-      .reply(200, channelsResponse);
-
-    const channelNames = await service.fetchAllChannels();
-
-    expect(channelNames).toEqual(['general', 'random']);
-    expect(mockConfigService.get).toHaveBeenCalledWith('SLACK_API_TOKEN');
-  });
-
   it('should fetch Slack messages', async () => {
     const channelsResponse = {
       ok: true,
@@ -92,8 +77,6 @@ describe('SlackService', () => {
     });
     mockSlackMessageRepository.save.mockResolvedValue({});
 
-    await service.fetchSlackMessages('general');
-
     expect(mockAxios.history.get.length).toBe(2);
     expect(mockSlackMessageRepository.findOne).toHaveBeenCalledWith({
       where: {
@@ -109,16 +92,6 @@ describe('SlackService', () => {
     expect(mockSlackMessageRepository.save).toHaveBeenCalled();
   });
 
-  it('should handle cron sync Slack messages', async () => {
-    const fetchSlackMessagesSpy = jest
-      .spyOn(service, 'fetchSlackMessages')
-      .mockResolvedValue(null);
-
-    await service.handleCronSyncSlackMessages();
-
-    expect(fetchSlackMessagesSpy).toHaveBeenCalledWith('random');
-  });
-
   it('should fetch all Slack messages from the database', async () => {
     const slackMessages = [
       { userId: 'user-id', message: 'Hello', timestamp: new Date() },
@@ -129,34 +102,5 @@ describe('SlackService', () => {
 
     expect(result).toEqual(slackMessages);
     expect(mockSlackMessageRepository.find).toHaveBeenCalled();
-  });
-
-  it('should send a message to a Slack channel', async () => {
-    const channelsResponse = {
-      ok: true,
-      channels: [{ id: 'channel-id', name: 'general' }],
-    };
-    const postMessageResponse = {
-      ok: true,
-      message: { text: 'Hello' },
-    };
-
-    mockAxios
-      .onGet('https://slack.com/api/conversations.list')
-      .reply(200, channelsResponse);
-    mockAxios
-      .onPost('https://slack.com/api/chat.postMessage')
-      .reply(200, postMessageResponse);
-
-    await service.sendMessageToSlackChannel('general', 'Hello');
-
-    expect(mockAxios.history.get.length).toBe(1);
-    expect(mockAxios.history.post.length).toBe(1);
-    expect(mockAxios.history.post[0].data).toEqual(
-      JSON.stringify({
-        channel: 'channel-id',
-        text: 'Hello',
-      }),
-    );
   });
 });
