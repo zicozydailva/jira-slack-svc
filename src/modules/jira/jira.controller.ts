@@ -15,4 +15,15 @@ export class JiraController {
       status: HttpStatus.OK,
     };
   }
+
+  @Get('seed-jira-repo')
+  async seedSlackMessages() {
+    const res = await this.jiraService.seedJiraIssues();
+
+    return {
+      data: res,
+      message: 'Slack Repo Seeded Successfully',
+      status: HttpStatus.OK,
+    };
+  }
 }
