@@ -31,7 +31,7 @@ async function bootstrap() {
     await dataSource.initialize();
     await app.listen(configService.get<string>('PORT'));
   } catch (error) {
-    console.error('Error during Data Source initialization:', error);
+    console.error('Error during Data Source initialization::', error);
   }
 }
 bootstrap();
