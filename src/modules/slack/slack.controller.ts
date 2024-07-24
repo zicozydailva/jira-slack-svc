@@ -5,17 +5,6 @@ import { SlackService } from './slack.service';
 export class SlackController {
   constructor(private readonly slackService: SlackService) {}
 
-  @Get('fetch/:channelName')
-  async fetchSlackMessages(@Param('channelName') channelName: string) {
-    const res = await this.slackService.fetchSlackMessages(channelName);
-
-    return {
-      data: res,
-      message: 'Slack messages fetched and stored',
-      status: HttpStatus.OK,
-    };
-  }
-
   @Get('fetch-channels')
   async fetchAllChannels() {
     const res = await this.slackService.fetchAllChannels();

@@ -24,22 +24,22 @@ export class AppController {
     const issueMentionCount = new Map<string, number>();
 
     // Map Slack messages to find mentioned Jira issues by summary
-    const patterns = slackMsgs.map((message) => {
-      const mentionedIssues = jiraIssues.filter((issue) =>
-        message.message.toLowerCase().includes(issue.summary.toLowerCase()),
-      );
+    // const patterns = slackMsgs.map((message) => {
+    //   const mentionedIssues = jiraIssues.filter((issue) =>
+    //     message.message.toLowerCase().includes(issue.summary.toLowerCase()),
+    //   );
 
-      // Increment mention count for each mentioned issue
-      mentionedIssues.forEach((issue) => {
-        const count = issueMentionCount.get(issue.summary) || 0;
-        issueMentionCount.set(issue.summary, count + 1);
-      });
+    //   // Increment mention count for each mentioned issue
+    //   mentionedIssues.forEach((issue) => {
+    //     const count = issueMentionCount.get(issue.summary) || 0;
+    //     issueMentionCount.set(issue.summary, count + 1);
+    //   });
 
-      return {
-        ...message,
-        mentionedIssues: mentionedIssues.map((issue) => issue.summary),
-      };
-    });
+    //   return {
+    //     ...message,
+    //     mentionedIssues: mentionedIssues.map((issue) => issue.summary),
+    //   };
+    // });
 
     // Convert the map to an array for easier use in a chart
     const issueMentionData = Array.from(issueMentionCount.entries()).map(
@@ -49,13 +49,13 @@ export class AppController {
       }),
     );
 
-    this.logger.log('patterns', patterns);
+    // this.logger.log('patterns', patterns);
     this.logger.log('issueMentionData', issueMentionData);
 
     // Return structured response with detailed analytics
     return {
       data: {
-        patterns,
+        // patterns,
         issueMentionData,
       },
       message: 'Pattern fetched successfully',

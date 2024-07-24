@@ -3,7 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { JiraIssue } from '../jira/entities';
+import { SlackMessage } from '../slack/entities';
 import { jiraIssuesData } from './data/jira';
+import { slackMessageData } from './data/slack';
 
 @Injectable()
 export class SeederService implements OnModuleInit {
@@ -11,25 +13,46 @@ export class SeederService implements OnModuleInit {
   constructor(
     @InjectRepository(JiraIssue)
     private readonly jiraIssueRepo: Repository<JiraIssue>,
+    @InjectRepository(SlackMessage)
+    private readonly slackMessageRepo: Repository<SlackMessage>,
   ) {}
 
   async onModuleInit() {
-    await this.seed();
+    await this.seedJiraIssues();
+    await this.seedSlackMessages();
   }
 
-  async seed() {
-    this.logger.log('[SEEDING] - starting');
+  async seedJiraIssues() {
+    this.logger.log('[SEEDING-JIRA] - processing');
 
-    for (const data of jiraIssuesData) {
-      const existingIssue = await this.jiraIssueRepo.findOne({
+    const seedPromises = jiraIssuesData.map(async (data) => {
+      const existingMessage = await this.jiraIssueRepo.findOne({
         where: { id: data.id },
       });
-      if (!existingIssue) {
-        await this.jiraIssueRepo.save(data);
-        this.logger.log('[SEEDING] - processing');
+      if (!existingMessage) {
+        return this.jiraIssueRepo.save(data);
       }
-    }
+    });
 
-    this.logger.log('[SEEDING] - done');
+    await Promise.all(seedPromises);
+
+    this.logger.log('[SEEDING-JIRA] - done');
+  }
+
+  async seedSlackMessages() {
+    this.logger.log('[SEEDING-SLACK] - processing');
+
+    const seedPromises = slackMessageData.map(async (data) => {
+      const existingMessage = await this.slackMessageRepo.findOne({
+        where: { ts: data.ts },
+      });
+      if (!existingMessage) {
+        return this.slackMessageRepo.save(data);
+      }
+    });
+
+    await Promise.all(seedPromises);
+
+    this.logger.log('[SEEDING-SLACK] - done');
   }
 }

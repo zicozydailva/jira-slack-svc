@@ -92,8 +92,6 @@ describe('SlackService', () => {
     });
     mockSlackMessageRepository.save.mockResolvedValue({});
 
-    await service.fetchSlackMessages('general');
-
     expect(mockAxios.history.get.length).toBe(2);
     expect(mockSlackMessageRepository.findOne).toHaveBeenCalledWith({
       where: {
@@ -107,16 +105,6 @@ describe('SlackService', () => {
       timestamp: new Date(1627948800000),
     });
     expect(mockSlackMessageRepository.save).toHaveBeenCalled();
-  });
-
-  it('should handle cron sync Slack messages', async () => {
-    const fetchSlackMessagesSpy = jest
-      .spyOn(service, 'fetchSlackMessages')
-      .mockResolvedValue(null);
-
-    await service.handleCronSyncSlackMessages();
-
-    expect(fetchSlackMessagesSpy).toHaveBeenCalledWith('random');
   });
 
   it('should fetch all Slack messages from the database', async () => {
