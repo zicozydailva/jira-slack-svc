@@ -1,8 +1,8 @@
 # Use an official Node.js runtime as a parent image
-FROM node:16
+FROM node:18.13.0
 
 # Set the working directory
-WORKDIR /app
+WORKDIR /src
 
 # Copy package.json and yarn.lock to the working directory
 COPY package.json yarn.lock ./
