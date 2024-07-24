@@ -20,4 +20,4 @@ RUN yarn build
 EXPOSE 3000
 
 # Define the command to run the application
-CMD ["yarn", "start:prod"]
+CMD ["node", "dist/main"]
