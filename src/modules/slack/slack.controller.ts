@@ -1,4 +1,4 @@
-import { Controller, Get, HttpStatus } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
 import { SlackService } from './slack.service';
 
 @Controller('slack')
@@ -6,8 +6,8 @@ export class SlackController {
   constructor(private readonly slackService: SlackService) {}
 
   @Get('fetch-messages')
-  async getAllSlackMessages() {
-    const res = await this.slackService.fetchAllSlackMessages();
+  async getAllSlackMessages(@Query('text') text: string) {
+    const res = await this.slackService.fetchAllSlackMessages(text);
 
     return {
       data: res,
