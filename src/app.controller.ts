@@ -1,4 +1,4 @@
-import { Controller, Get, HttpStatus, Logger } from '@nestjs/common';
+import { Controller, Get, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JiraIssue } from './modules/jira/entities';
@@ -6,7 +6,6 @@ import { SlackMessage } from './modules/slack/entities';
 
 @Controller('jira-slack/')
 export class AppController {
-  private logger = new Logger(AppController.name);
   constructor(
     @InjectRepository(SlackMessage)
     private slackMessageRepository: Repository<SlackMessage>,
