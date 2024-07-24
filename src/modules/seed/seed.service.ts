@@ -19,8 +19,8 @@ export class SeederService implements OnModuleInit {
 
   async onModuleInit() {
     // COMMENTED OUT - because seeding process is done and the data is one-time
-    await this.seedJiraIssues();
-    await this.seedSlackMessages();
+    // await this.seedJiraIssues();
+    // await this.seedSlackMessages();
   }
 
   async seedJiraIssues() {
@@ -36,7 +36,6 @@ export class SeederService implements OnModuleInit {
     });
 
     await Promise.all(seedPromises);
-
     this.logger.log('[SEEDING-JIRA] - done');
   }
 

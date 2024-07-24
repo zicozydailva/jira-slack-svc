@@ -15,4 +15,20 @@ export const jiraIssuesData = [
     },
     summary: 'Viriliter corrigo curto urbanus animadverto.',
   },
+  {
+    id: 'JIRA-1',
+    created: '2024-03-16T22:22:37.555Z',
+    updated: '2024-03-19T01:12:40.694Z',
+    status: {
+      name: 'Closed',
+    },
+    assignee: {
+      displayName: 'Virginia Pollich DDS',
+      emailAddress: 'Larissa.Cormier@gmail.com',
+    },
+    priority: {
+      name: 'Lowest',
+    },
+    summary: 'Cultellus blandior excepturi aranea comes.',
+  },
 ];

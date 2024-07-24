@@ -15,4 +15,15 @@ export class SlackController {
       status: HttpStatus.OK,
     };
   }
+
+  @Get('seed-slack-repo')
+  async seedSlackMessages() {
+    const res = await this.slackService.seedSlackMessages();
+
+    return {
+      data: res,
+      message: 'Slack Repo Seeded Successfully',
+      status: HttpStatus.OK,
+    };
+  }
 }
