@@ -5,7 +5,7 @@ import { JiraService } from './jira.service';
 export class JiraController {
   constructor(private readonly jiraService: JiraService) {}
 
-  @Get('issues')
+  @Get('fetch-issues')
   async getAllSlackMessages() {
     const res = await this.jiraService.fetchAllJiraIssues();
 

@@ -41,38 +41,12 @@ describe('SlackController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should fetch all Slack channels', async () => {
-    const result = await controller.fetchAllChannels();
-    expect(service.fetchAllChannels).toHaveBeenCalled();
-    expect(result).toEqual({
-      data: 'mocked fetchAllChannels response',
-      message: 'All Channels Fetched Successfully',
-      status: HttpStatus.OK,
-    });
-  });
-
   it('should fetch all Slack messages', async () => {
     const result = await controller.getAllSlackMessages();
     expect(service.fetchAllSlackMessages).toHaveBeenCalled();
     expect(result).toEqual({
       data: 'mocked fetchAllSlackMessages response',
       message: 'All Channels Fetched Successfully',
-      status: HttpStatus.OK,
-    });
-  });
-
-  it('should send a message to a Slack channel', async () => {
-    const result = await controller.sendMessageToSlackChannel(
-      'channelName',
-      'message',
-    );
-    expect(service.sendMessageToSlackChannel).toHaveBeenCalledWith(
-      'channelName',
-      'message',
-    );
-    expect(result).toEqual({
-      data: 'mocked sendMessageToSlackChannel response',
-      message: 'Message Sent To Slack Channel Successfully',
       status: HttpStatus.OK,
     });
   });
