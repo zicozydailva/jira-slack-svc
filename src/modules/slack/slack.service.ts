@@ -32,23 +32,6 @@ export class SlackService {
     }
   }
 
-  // async seedSlackMessages() {
-  //   this.logger.log('[SEEDING-SLACK] - processing');
-
-  //   const seedPromises = slackMessageData.map(async (data) => {
-  //     const existingMessage = await this.slackMessageRepository.findOne({
-  //       where: { ts: data.ts },
-  //     });
-  //     if (!existingMessage) {
-  //       return this.slackMessageRepository.save(data);
-  //     }
-  //   });
-
-  //   await Promise.all(seedPromises);
-
-  //   this.logger.log('[SEEDING-SLACK] - done');
-  // }
-
   async seedSlackMessages() {
     this.logger.log('[SEEDING-SLACK] - processing');
 
@@ -67,7 +50,6 @@ export class SlackService {
 
       await Promise.all(seedPromises); // Process the batch concurrently
       this.logger.log('[SEEDING-SLACK] - processing111');
-
     }
 
     this.logger.log('[SEEDING-SLACK] - done');

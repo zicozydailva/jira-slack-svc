@@ -34,12 +34,12 @@ export class JiraService {
 
   async seedJiraIssues() {
     this.logger.log('[SEEDING-JIRA] - processing');
-  
+
     const batchSize = 100; // Define your batch size
-  
+
     for (let i = 0; i < jiraIssuesData.length; i += batchSize) {
       const batch = jiraIssuesData.slice(i, i + batchSize);
-  
+
       const seedPromises = batch.map(async (data) => {
         const existingIssue = await this.jiraIssueRepository.findOne({
           where: { id: data.id },
@@ -48,10 +48,10 @@ export class JiraService {
           return this.jiraIssueRepository.save(data);
         }
       });
-  
+
       await Promise.all(seedPromises); // Process the batch concurrently
     }
-  
+
     this.logger.log('[SEEDING-JIRA] - done');
   }
 }
